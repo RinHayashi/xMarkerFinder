@@ -21,6 +21,7 @@ Please cite: Wenxing Gao, Wanning Chen, Wenjing Yin et al. Identification and va
   * [Stage 2 Model construction](#stage-2-model-construction)
   * [Stage 3 Model validation](#stage-3-model-validation)
   * [Stage 4 Biomarker interpretation](#stage-4-biomarker-interpretation)
+* [Case study](#case-study)
 * [FAQs](#faqs)
   * [Part I General questions](#part-i-general-questions)
   * [Part II Data processing](#part-ii-data-processing)
@@ -451,6 +452,13 @@ results/all_associations.txt: associations between different omics or dimensions
 results/hallagram.png: the visualization of all_associations.txt with only significant associations highlighted.   
 
 
+## Case study
+It’s worth highlighting that xMarkerFinder is designed as a standard protocol with a high level of impartiality regarding data type and microbial habitat. In other words, xMarkerFinder’s versatility goes beyond its initial purpose in gut microbiome research, making it suitable for diverse microbial biomes. 
+To provide further clarity, we present three examples showcasing the application of xMarkerFinder across various contexts. Firstly, we used datasets from previous publications containing 16S rRNA gene sequencing data of the oral microbiome of patients with oral squamous cell carcinoma (OSCC) and controls. We applied xMarkerFinder to these oral microbiome datasets and successfully identified consistent microbial signatures associated with OCSS with great diagnostic capabilities. Secondly, we employed metagenomic datasets from the Tara Ocean project to characterize important microbiota within the oceanic environment, capable of distinguishing between deep and surface regions. 
+<img width="435" alt="image" src="https://github.com/tjcadd2020/xMarkerFinder/assets/54845977/576a6174-84d6-4cc1-b5ad-f2493b2a3d6e">
+To demonstrate its generalizability in different omics data, we applied xMarkerFinder to transcriptomic datasets of non-alcoholic steatohepatitis (NASH) patients, using three publicly available NASH cohorts. The resulting classification model reached an impressive AUC value of 0.99, highlighting the robustness and applicability of xMarkerFinder.
+<img width="468" alt="image" src="https://github.com/tjcadd2020/xMarkerFinder/assets/54845977/27b3377f-5382-47ac-b8c4-816286666d1f">
+These examples collectively serve as compelling evidence of the extensive scope of applicability inherent in xMarkerFinder.
 
 
 
