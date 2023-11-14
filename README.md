@@ -459,10 +459,11 @@ results/hallagram.png: the visualization of all_associations.txt with only signi
 It’s worth highlighting that xMarkerFinder is designed as a standard protocol with a high level of impartiality regarding data type and microbial habitat. In other words, xMarkerFinder’s versatility goes beyond its initial purpose in gut microbiome research, making it suitable for diverse microbial biomes. 
 To provide further clarity, we present three examples showcasing the application of xMarkerFinder across various contexts. 
 #### Human microbiome
-Firstly, we used datasets from previous publications containing 16S rRNA gene sequencing data of the oral microbiome of patients with oral squamous cell carcinoma (OSCC) and controls. We applied xMarkerFinder to these oral microbiome datasets and successfully identified consistent microbial signatures associated with OCSS with great diagnostic capabilities. 
+Firstly, we used datasets from previous publications containing 16S rRNA gene sequencing data of the oral microbiome of patients with oral squamous cell carcinoma (OSCC) and controls. We applied xMarkerFinder to these oral microbiome datasets and successfully identified consistent microbial signatures associated with OCSS with great diagnostic capabilities.   
+<img width="800" alt="image" src="https://github.com/tjcadd2020/xMarkerFinder/assets/54845977/4ac5018f-7f98-429f-9ce7-6d9ce6c71d26">   
 #### Ocean microbiome
-Secondly, we employed metagenomic datasets from the Tara Ocean project to characterize important microbiota within the oceanic environment, capable of distinguishing between deep and surface regions.   
-<img width="800" alt="image" src="https://github.com/tjcadd2020/xMarkerFinder/assets/54845977/576a6174-84d6-4cc1-b5ad-f2493b2a3d6e">  
+Secondly, we employed metagenomic datasets from the Tara Ocean project to characterize important microbiota within the oceanic environment, capable of distinguishing between deep and surface regions.     
+<img width="800" alt="image" src="https://github.com/tjcadd2020/xMarkerFinder/assets/54845977/434ac5a6-b1d5-499d-b58f-6db2fe0ff11f">    
 #### Human transcriptome
 To demonstrate its generalizability in different omics data, we further applied xMarkerFinder to transcriptomic datasets of non-alcoholic steatohepatitis (NASH) patients, using three publicly available NASH cohorts. The resulting classification model reached an impressive AUC value of 0.99, highlighting the robustness and applicability of xMarkerFinder.  
 <img width="800" alt="image" src="https://github.com/tjcadd2020/xMarkerFinder/assets/54845977/27b3377f-5382-47ac-b8c4-816286666d1f">  
