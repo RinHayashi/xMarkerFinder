@@ -1,0 +1,127 @@
+# Defining variables that can be used across rules
+WORKPLACE = "/workplace/"
+NORM_METHOD = "REL"  # You can change this based on your needs from {REL, TMM, AST, CLR}
+COHORT_COLUMN = "Cohort" # You should specify the column name of cohort in your own metadata
+GROUP_COLUMN = "Group" # You should specify the column name of group in your own metadata
+EXPOSURE_GROUP = "CRC" # You should specify the exposure group of your data
+CLASSIFIER = "RF"  # You can change this based on your needs from {LRl1, LRl2, DT, GB, RF, SVC, KNN}
+PREFIX = "Test" # You can specify the output file names
+SEED = 0  # Default seed
+        
+# Step 1: Data normalization
+rule normalization:
+    input:
+        abundance="abundance.txt"
+    output:
+        normalized_abundance="TEST_normalized_abundance.txt"
+    shell:
+        "Rscript 1_Normalization.R -W {WORKPLACE} -p {input.abundance} -m {NORM_METHOD} -o {PREFIX}"
+
+# Step 2: Data filtering
+rule filtering:
+    input:
+        metadata="train_metadata.txt",
+        normalized_abundance="TEST_normalized_abundance.txt"
+    output:
+        filtered_abundance="TEST_filtered_abundance.txt"
+    shell:
+        "Rscript 2_Filtering.R -W {WORKPLACE} -m {input.metadata} -p {input.normalized_abundance} "
+        "-b {COHORT_COLUMN} -t 2 -o {PREFIX}"
+
+# Step 3: Confounder analysis
+rule confounder_analysis:
+    input:
+        metadata="train_metadata.txt",
+        filtered_abundance="TEST_filtered_abundance.txt"
+    output:
+        confounder="TEST_metadata_microbiota.txt",
+        pcoa_plot="TEST_pcoa_plot.pdf"
+    shell:
+        "Rscript 3_Confounder_analysis.R -W {WORKPLACE} -m {input.metadata} -p {input.filtered_abundance} "
+        "-d bc -c 999 -g {GROUP_COLUMN} -o {PREFIX}"
+
+# Step 4: Differential analysis
+rule differential_analysis:
+    input:
+        metadata="train_metadata.txt",
+        filtered_abundance="TEST_filtered_abundance.txt",
+        covariates="covariates.txt"
+    output:
+        diff_sig_single="TEST_differential_significance_single_cohort.txt",
+        diff_sig="TEST_differential_significance.txt",
+        diff_signature="TEST_differential_signature.txt",
+        diff_plot="TEST_differential_plot.pdf"
+    shell:
+        "Rscript 4_Differential_analysis.R -W {WORKPLACE} -m {input.metadata} -p {input.filtered_abundance} "
+        "-e {EXPOSURE_GROUP} -g {GROUP_COLUMN} -b {COHORT_COLUMN} -c {input.covariates} -a F -t 0.05 -o {PREFIX}"
+
+# Step 5: Classifier selection
+rule classifier_selection:
+    input:
+        metadata="train_metadata.txt",
+        diff_signature="TEST_differential_signature.txt",
+    output:
+        classifier_selection="TEST_classifier_selection.txt",
+    shell:
+        "python 5_Classifier_selection.py  -W {WORKPLACE} -m {input.metadata} -p {input.diff_signature} "
+        "-e {EXPOSURE_GROUP} -g {GROUP_COLUMN} -s {SEED} -o {PREFIX}"
+
+# Step 6a: Feature effectiveness evaluation
+rule feature_effectiveness_evaluation:
+    input:
+        metadata="train_metadata.txt",
+        diff_signature="TEST_differential_signature.txt",
+    output:
+        feature_auc="feature_auc.txt",
+        effective_feature="effective_feature.txt",
+    shell:
+        "python 6a_Feature_effectiveness_evaluation.py  -W {WORKPLACE} -m {input.metadata} -p {input.diff_signature} "
+        "-e {EXPOSURE_GROUP} -g {GROUP_COLUMN} -b {COHORT_COLUMN} -s {SEED} -t 0.5 -o {PREFIX}"
+
+# Step 6b: Collinear feature exclusion
+rule collinear_feature_exclusion:
+    input:
+        effective_feature="effective_feature.txt",
+    output:
+        feature_correlation="feature_correlation.txt",
+        uncorrelated_effective_feature="uncorrelated_effective_feature.txt",
+    shell:
+        "python 6b_Collinear_feature_exclusion.py  -W {WORKPLACE} -p {input.effective_feature} "
+        "-t 0.7 -o {PREFIX}"
+
+# Step 6c: Recursive feature elimination
+rule recursive_feature_elimination:
+    input:
+        metadata="train_metadata.txt",
+        uncorrelated_effective_feature="uncorrelated_effective_feature.txt",
+    output:
+        candidate_biomarker="candidate_biomarker.txt",
+    shell:
+        "python 6c_Recursive_feature_elimination.py -W {WORKPLACE} -m {input.metadata} -p {input.uncorrelated_effective_feature} "
+        "-e {EXPOSURE_GROUP} -g {GROUP_COLUMN} -c {CLASSIFIER} -s {SEED} -o {PREFIX}"
+
+# Step 7: Hyperparameter tuning
+rule hyperparameter_tuning:
+    input:
+        metadata="train_metadata.txt",
+        candidate_biomarker="candidate_biomarker.txt",
+    output:
+        best_param="best_param.txt",
+        optimal_cross_validation="optimal_cross_validation.txt",
+        cross_validation_auc="cross_validation_auc.pdf",
+    shell:
+        "python 7_Hyperparameter_tuning.py -W {WORKPLACE} -m {input.metadata} -p {input.candidate_biomarker} "
+        "-e {EXPOSURE_GROUP} -g {GROUP_COLUMN} -c {CLASSIFIER} -s {SEED} -o {PREFIX}"
+
+# Step 8: Validation
+rule validation:
+    input:
+        metadata="train_metadata.txt",
+        candidate_biomarker="candidate_biomarker.txt",
+    output:
+        validation_metric="validation_metric.txt",
+        validation_metric="validation_metric.pdf",
+    shell:
+        "python 8_Validation.py -W {WORKPLACE} -m {input.metadata} -p {input.candidate_biomarker} "
+        "-e {EXPOSURE_GROUP} -g {GROUP_COLUMN} -b {COHORT_COLUMN} -c {CLASSIFIER} -s {SEED} -o {PREFIX}"
+
