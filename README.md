@@ -232,7 +232,7 @@ The second step of feature selection aims to exclude collinear issue caused by h
 $ python 7_Collinear_feature_exclusion.py -W /workplace/ -p effective_feature.txt -t 0.7 -o TEST
 ```
 ```
--p input effective feature file (output file of Step 6a)
+-p input effective feature file (output file of Step 6)
 -t correlation threshold for collinear feature exclusion (default:0.7)
 ```
 - Input files:  
@@ -247,7 +247,7 @@ The last step of feature selection recursively eliminates the weakest feature pe
 $ python 8_Recursive_feature_elimination.py -W /workplace/ -m train_metadata.txt -p uncorrelated_effective_feature.txt -g Group -e exposure -c classifier -s 0 -o TEST
 ```
 ```
--p input uncorrelated-effective feature file (output file of Step 6b)
+-p input uncorrelated-effective feature file (output file of Step 7)
 ```
 - Input files:  
 train_metadata.txt: the clinical metadata of the training dataset.  
@@ -260,11 +260,11 @@ Besides Triple-E feature selection procedure, we provide an alternative method, 
 $ Rscript Boruta_feature_selection.R -W /workplace/ -m metadata.txt -p differential_signature.txt -g Group -s 0 -o TEST
 ```
 ```
--p input differential signature profile (output file of Step 4) or uncorrelated-effective feature file (output file of Step 6b)
+-p input differential signature profile (output file of Step 4) or uncorrelated-effective feature file (output file of Step 7)
 ```
 - Input files:  
 metadata.txt: the clinical metadata of the training dataset.  
-differential_signature.txt: *differential signatures* used for feature selection (could also be *uncorrelated-effective features* from Step 6b).  
+differential_signature.txt: *differential signatures* used for feature selection (could also be *uncorrelated-effective features* from Step 7).  
 - Output files:  
 boruta_feature_imp.txt: confirmed feature importances via Boruta algorithm.  
 boruta_selected_feature.txt: selected feature profile, used as input *candidate biomarkers* for subsequent steps.  
@@ -274,7 +274,7 @@ Based on the selected classifier and *candidate biomarkers*, the hyperparameters
 $ python 9_Hyperparameter_tuning.py -W /workplace/ -m train_metadata.txt -p candidate_biomarker.txt -g Group -e exposure -c classifier -s 0 -o TEST
 ```
 ```
--p input candidate marker profile (output file of Step 6)
+-p input candidate marker profile (output file of Step 8)
 ```
 - Input files:  
 train_metadata.txt: the clinical metadata of the training dataset.  
@@ -284,13 +284,13 @@ best_param.txt: the best hyperparameter combination of classification model.
 optimal_cross_validation.txt: the overall cross-validation performance of the best-performing model.  
 cross_validation_auc.pdf: the visualization of the cross-validation AUC of the best-performing model.   
 ### Stage 3 Model validation
-#### 10.	Internal validations (8a. intra-cohort, 8b. cohort-to-cohort, and 8c. LOCO validation). 
+#### 10.	Internal validations ( intra-cohort, cohort-to-cohort, and LOCO validation). 
 As stated above, this step provides extensive internal validations to ensure the robustness and reproducibility of identified *candidate biomarkers* in different cohorts via intra-cohort validation, cohort-to-cohort transfer, and LOCO validation. Output files contain multiple performance metrics used to assess the markers internally, including AUC, specificity, sensitivity, accuracy, precision and F1 score.  
 ```
-$ python 8_Validation.py -W /workplace/ -m metadata.txt -p candidate_biomarker.txt -g Group -e exposure -b Cohort -c classifier -s 0 -o TEST
+$ python 10_Validation.py -W /workplace/ -m metadata.txt -p candidate_biomarker.txt -g Group -e exposure -b Cohort -c classifier -s 0 -o TEST
 ```
 ```
--p input optimal candidate marker file (output file of Step 6)
+-p input optimal candidate marker file (output file of Step 8)
 ```
 - Input files:  
 metadata.txt: the clinical metadata of the training dataset.  
@@ -306,7 +306,7 @@ $ python 11_Test.py -W /workplace/ -m train_metadata.txt -p candidate_biomarker.
 ```
 -a input external metadata file for the test dataset
 -x input external microbial relative abundance file as the test dataset
--r input optimal hyperparameter file (output file of Step 7)
+-r input optimal hyperparameter file (output file of Step 9)
 ```
 - Input files:  
 train_metadata.txt: the clinical metadata of the training dataset.  
@@ -319,7 +319,7 @@ test_auc.pdf: the visualization of the AUC value in test_result.txt.
 #### 12.	Biomarker specificity assessment.   
 To further assess markers’ specificity for the experimental group of interest, they are used to construct classification models to discriminate between other related diseases and corresponding controls. Cross-validation AUC values of other classification models and visualization are returned.   
 ```
-$ python 12_Specificity.py -W /workplace/ -p candidate_biomarker.txt -q test_metadata.txt -l test_relative_abundance.txt -a other_metadata.txt -x other_relative_abundance.txt -g Group -e CTR -b Cohort -c classifier -r best_param.txt -s 0 -o TEST
+$ python 12_Biomarker_specificity.py -W /workplace/ -p candidate_biomarker.txt -q test_metadata.txt -l test_relative_abundance.txt -a other_metadata.txt -x other_relative_abundance.txt -g Group -e CTR -b Cohort -c classifier -r best_param.txt -s 0 -o TEST
 ```
 ```
 -q input external test metadata file for the test dataset
@@ -339,7 +339,7 @@ specificity_auc.pdf: the visualization of the specificity_result.txt.
 ##### 13.	Model specificity assessment.   
 Random samples of case and control class of other diseases are added into the classification model, respectively, both labeled as “control”, the variations of corresponding AUCs of which are calculated and used for visualization.   
 ```
-$ python 13_Specificity_add.py -W /workplace/ -m train_metadata.txt -p candidate_biomarker.txt -q test_metadata.txt -l test_profile.txt -a other_metadata.txt -x other_profile.txt -g Group -e exposure -b Cohort -c classifier -r hyperparamter.txt -n 5 -s 0 -o TEST
+$ python 13_Model_specificity_add.py -W /workplace/ -m train_metadata.txt -p candidate_biomarker.txt -q test_metadata.txt -l test_profile.txt -a other_metadata.txt -x other_profile.txt -g Group -e exposure -b Cohort -c classifier -r hyperparamter.txt -n 5 -s 0 -o TEST
 ```
 ```
 -q input external metadata file for the test dataset
@@ -364,11 +364,11 @@ specificity_add_auc.pdf: the visualization of the specificity_result.txt.
 #### 14.	Biomarker importance.
 Permutation feature importance is employed here to evaluate biomarkers’ contributions in the best-performing classification model.  
 ```
-$ python 10_Biomarker_importance.py -W /workplace/ -m train_metadata.txt -p candidate_biomarker.txt -g Group -e exposure -c classifier -r best_param.txt -s 0 -o TEST
+$ python 14_Biomarker_importance.py -W /workplace/ -m train_metadata.txt -p candidate_biomarker.txt -g Group -e exposure -c classifier -r best_param.txt -s 0 -o TEST
 ```
 ```
--p input candidate biomarkers (output file of Step 6)
--r input optimal hyperparameter file (output file of Step 7)
+-p input candidate biomarkers (output file of Step 8)
+-r input optimal hyperparameter file (output file of Step 9)
 -n input number for biomarker abundance visualization
 ```
 - Input files:  
@@ -379,23 +379,21 @@ best_param.txt: the best hyperparameter combination of classification model.
 biomarker_importance.txt: permutation feature importance of *candidate biomarkers* via ten permutations.  
 biomarker_importance.pdf: the visualization of feature importance file.
 Biomarker_distribution.pdf: the visualization for the abundances of the top n (set by users) important biomarkers in the discovery dataset.
-#### 11.	Microbial co-occurrence network.  
-Inter-microbiota correlation is calculated using FastSpar with 50 iterations and the output files contain the correlation and p value between each microbiota pair.   
-##### 15. Convert.
+#### 15. Convert microbial abundance files to meet the criterion for network construction.
 As the input file for Step 11b needs to be microbial count profile in .tsv format where each row describes a microbial signature and each column represents a sample (could be converted profiles of all features, *differential signatures*, or *candidate biomarkers* according to users’ need, and null values needed to be set as 0) and header needs to start with “#OTU ID”, an additional file conversion script is provided.  
 ```
 $ python 15_Convert.py -W /workplace/ -p abundance.txt -s selected_feature.txt -o TEST
 ```
 ```
 -p input feature raw count file before normalization.
--s selected features for calculating microbial correlation (could be differential signatures or candidate markers, output file of Step 4 or 6).
+-s selected features for calculating microbial correlation (could be differential signatures or candidate markers, output file of Step 4 or 8).
 ```
 - Input files:  
 abundance.txt: microbial raw count profile before normalization.  
-selected_feature.txt: selected features for calculating microbial co-occurrence network (output file of Step 4 or 6)  
+selected_feature.txt: selected features for calculating microbial co-occurrence network (output file of Step 4 or 8)  
 - Output files:  
 convert.tsv: the converted file appropriate for constructing microbial co-occurrence network.  
-##### 16. Microbial co-occurrence network.
+#### 16. Microbial co-occurrence network.
 ```
 $ ./16_Microbial_network.sh -W /workplace/ –i feature_abundance.tsv -o TEST -t 4
 ```
@@ -404,14 +402,14 @@ $ ./16_Microbial_network.sh -W /workplace/ –i feature_abundance.tsv -o TEST -t
 -t threads of available computational source  
 ```
 - Input files:  
-convert.tsv: microbial count profile in .tsv format where each row describes a microbial signature and each column represents a sample and the header needs to start with “#OTU ID”. Example input file is provided and users are recommended to user Step 11a to convert files into appropriate formats.  
+convert.tsv: microbial count profile in .tsv format where each row describes a microbial signature and each column represents a sample and the header needs to start with “#OTU ID”. Example input file is provided and users are recommended to user Step 15 to convert files into appropriate formats.  
 -t the threads of available computational source when running  
 - Output files:  
 median_correlation.tsv: the correlation coefficients between every input signature pair.  
 pvalues.tsv: the statistical significance of median_correlation.tsv.  
-##### 17. Microbial co-occurrence network plot. 
-The visualization of Step 11 is performed using Gephi.  
-(i) Preprocess of the results of Step 11b to ensure that Step 11c only draws significant correlations (pvalues<0.05) with absolute correlation coefficients above 0.5 (default).
+#### 17. Microbial co-occurrence network plot. 
+The visualization of Step 16 is performed using Gephi.  
+Preprocess of the results of Step 16 to ensure that Step 17 only draws significant correlations (pvalues<0.05) with absolute correlation coefficients above 0.5 (default).
 ```
 $ python 17_Microbial_network_plot.py -W /workplace/ –c median_correlation.tsv -p pvalues.tsv -t 0.5 -o TEST 
 ```
@@ -425,15 +423,15 @@ median_correlation.tsv: the correlation coefficients profile (output file of Ste
 pvalues.tsv: the statistical significance of median_correlation.tsv (output file of Step 11b).
 - Output files:
 microbial_network.csv: adjusted network profile for Gephi input, only significant correlations reserved.  
-(ii)	Open Gephi and click "File" – "Import spreadsheet", and then choose the adjusted network profile.  
+#### 18. Open Gephi and click "File" – "Import spreadsheet", and then choose the adjusted network profile.  
 <img width="415" alt="image" src="https://user-images.githubusercontent.com/54845977/173520689-3f4a34e5-e2a6-4ba8-b2ae-b8160ebb0d1d.png">
 
-(iii) Import the network file.  
+#### 19. Import the network file.  
 <img width="383" alt="image" src="https://user-images.githubusercontent.com/54845977/173520895-9c15d969-13eb-4b07-9c9c-fa83b6ae00e9.png">
 
-(iv)  Choose a preferable layout type to form the basic network and press the “stop” button when the network becomes stable (Fruchterman Reingold style is recommended).    
+#### 20. Choose a preferable layout type to form the basic network and press the “stop” button when the network becomes stable (Fruchterman Reingold style is recommended).    
 <img width="415" alt="image" src="https://user-images.githubusercontent.com/54845977/171319813-0fed579e-6c7d-4581-bf7e-174aa8d391e1.png">   
-(v)  For further optimization of the network, the appearances of nodes and edges should be adjusted according to users’ needs, as well as the labels of nodes.  
+#### 21. For further optimization of the network, the appearances of nodes and edges should be adjusted according to users’ needs, as well as the labels of nodes.  
 <img width="415" alt="image" src="https://user-images.githubusercontent.com/54845977/171319835-a572168e-fad4-47d0-a03b-16b528c99d54.png">    
 
 #### 22.	Multi-omics correlation. 
