@@ -209,11 +209,10 @@ train_metadata.txt: the clinical metadata of the training dataset.
 differential_signature.txt: significantly *differential signatures* between groups.  
 - Output files:  
 classifier_selection.txt: the overall cross-validation performance of all classifiers using differential signatures, used to determine the most suitable classifier.  
-#### 6.	Feature selection.
-##### 6a. Feature effectiveness evaluation  
+#### 6. Feature effectiveness evaluation  
 The first step of Triple-E feature selection procedure evaluates the predictive capability of every feature via constructing individual classification models respectively. Users should specify an ML algorithm here and in every future step as the overall classifier for the whole protocol from the following options: *LRl1*, *LRl2*, *KNN*, *SVC*, *DT*, *RF*, and *GB*. Features with cross-validation AUC above the threshold (default:0.5) are defined as *effective features* and are returned in the output file.  
 ```
-$ python 6a_Feature_effectiveness_evaluation.py -W /workplace/ -m train_metadata.txt -p differential_signature.txt -g Group -e exposure -b Cohort -c classifier -s 0 -t 0.5 -o TEST
+$ python 6_Feature_effectiveness_evaluation.py -W /workplace/ -m train_metadata.txt -p differential_signature.txt -g Group -e exposure -b Cohort -c classifier -s 0 -t 0.5 -o TEST
 ```
 ```
 -p input differential signature file (output file of Step 4)
@@ -227,10 +226,10 @@ differential_signature.txt: significantly *differential signatures* between grou
 - Output files:  
 feature_auc.txt: cross-validation AUC values of individual features.  
 effective_feature.txt: features derived from *differential signatures* that are capable of predicting disease states, used as input file of the following step.  
-##### 6b.	Collinear feature exclusion.   
+#### 7.	Collinear feature exclusion.   
 The second step of feature selection aims to exclude collinear issue caused by highly correlated features based on the result of Step 7 and returns the uncorrelated-effective features.
 ```
-$ python 6b_Collinear_feature_exclusion.py -W /workplace/ -p effective_feature.txt -t 0.7 -o TEST
+$ python 7_Collinear_feature_exclusion.py -W /workplace/ -p effective_feature.txt -t 0.7 -o TEST
 ```
 ```
 -p input effective feature file (output file of Step 6a)
@@ -242,10 +241,10 @@ effective_feature.txt: features with classification capability.
 - Output files:  
 feature_correlation.txt: spearman correlation coefficients of every feature pair.  
 uncorrelated_effective_feature.txt: features derived from input *effective features* excluding highly collinear features, used as input file of the following step.  
-##### 6c.	Recursive feature elimination.   
+#### 8.	Recursive feature elimination.   
 The last step of feature selection recursively eliminates the weakest feature per loop to sort out the minimal panel of *candidate biomarkers*.  
 ```
-$ python 6c_Recursive_feature_elimination.py -W /workplace/ -m train_metadata.txt -p uncorrelated_effective_feature.txt -g Group -e exposure -c classifier -s 0 -o TEST
+$ python 8_Recursive_feature_elimination.py -W /workplace/ -m train_metadata.txt -p uncorrelated_effective_feature.txt -g Group -e exposure -c classifier -s 0 -o TEST
 ```
 ```
 -p input uncorrelated-effective feature file (output file of Step 6b)
@@ -255,10 +254,10 @@ train_metadata.txt: the clinical metadata of the training dataset.
 uncorrelated_effective_feature.txt: independent features derived from *effective features*.  
 - Output files:  
 candidate_biomarker.txt: identified optimal panel of *candidate biomarkers*, used as model input for all subsequent steps.  
-#### 6*.	Boruta feature selection. 
+#### Boruta feature selection. 
 Besides Triple-E feature selection procedure, we provide an alternative method, feature selection with the Boruta algorithm.  
 ```
-$ Rscript alt_6_Boruta_feature_selection.R -W /workplace/ -m metadata.txt -p differential_signature.txt -g Group -s 0 -o TEST
+$ Rscript Boruta_feature_selection.R -W /workplace/ -m metadata.txt -p differential_signature.txt -g Group -s 0 -o TEST
 ```
 ```
 -p input differential signature profile (output file of Step 4) or uncorrelated-effective feature file (output file of Step 6b)
@@ -269,10 +268,10 @@ differential_signature.txt: *differential signatures* used for feature selection
 - Output files:  
 boruta_feature_imp.txt: confirmed feature importances via Boruta algorithm.  
 boruta_selected_feature.txt: selected feature profile, used as input *candidate biomarkers* for subsequent steps.  
-#### 7.	Hyperparameter tuning.   
+#### 9.	Hyperparameter tuning.   
 Based on the selected classifier and *candidate biomarkers*, the hyperparameters of the classification model are adjusted via bayesian optimization method based on cross-validation AUC. The output files contain the tuned hyperparameters and the multiple performance metric values of the constructed best-performing model.  
 ```
-$ python 7_Hyperparameter_tuning.py -W /workplace/ -m train_metadata.txt -p candidate_biomarker.txt -g Group -e exposure -c classifier -s 0 -o TEST
+$ python 9_Hyperparameter_tuning.py -W /workplace/ -m train_metadata.txt -p candidate_biomarker.txt -g Group -e exposure -c classifier -s 0 -o TEST
 ```
 ```
 -p input candidate marker profile (output file of Step 6)
@@ -285,7 +284,7 @@ best_param.txt: the best hyperparameter combination of classification model.
 optimal_cross_validation.txt: the overall cross-validation performance of the best-performing model.  
 cross_validation_auc.pdf: the visualization of the cross-validation AUC of the best-performing model.   
 ### Stage 3 Model validation
-#### 8.	Internal validations (8a. intra-cohort, 8b. cohort-to-cohort, and 8c. LOCO validation). 
+#### 10.	Internal validations (8a. intra-cohort, 8b. cohort-to-cohort, and 8c. LOCO validation). 
 As stated above, this step provides extensive internal validations to ensure the robustness and reproducibility of identified *candidate biomarkers* in different cohorts via intra-cohort validation, cohort-to-cohort transfer, and LOCO validation. Output files contain multiple performance metrics used to assess the markers internally, including AUC, specificity, sensitivity, accuracy, precision and F1 score.  
 ```
 $ python 8_Validation.py -W /workplace/ -m metadata.txt -p candidate_biomarker.txt -g Group -e exposure -b Cohort -c classifier -s 0 -o TEST
@@ -299,11 +298,10 @@ candidate_biomarker.txt: the optimal panel of candidate markers.
 - Output files:  
 validation_metric.txt: the overall performance of *candidate biomarkers* in internal validations. 
 validation_metric.pdf: the visualization of input file.  
-#### 9.	External validation.
-##### 9a. Independent test.
+#### 11. Independent test.
 As the best-performing *candidate biomarkers* and classification model are established, the test dataset is used to externally validate their generalizability. The input external metadata and microbial relative profiles need to be in the same format as initial input files for the training dataset. This step returns the overall performance of the model and its AUC plot.  
 ```
-$ python 9a_Test.py -W /workplace/ -m train_metadata.txt -p candidate_biomarker.txt -a external_metadata.txt -x external_profile.txt -g Group -e exposure -c classifier -r hyperparamter.txt -s 0 -o TEST
+$ python 11_Test.py -W /workplace/ -m train_metadata.txt -p candidate_biomarker.txt -a external_metadata.txt -x external_profile.txt -g Group -e exposure -c classifier -r hyperparamter.txt -s 0 -o TEST
 ```
 ```
 -a input external metadata file for the test dataset
@@ -318,10 +316,10 @@ test_profile.txt: the relative abundance matrix of the external test dataset.
 - Output files:  
 test_result.txt: the overall performance of model in external test dataset.  
 test_auc.pdf: the visualization of the AUC value in test_result.txt.  
-##### 9b.	Biomarker specificity assessment.   
+#### 12.	Biomarker specificity assessment.   
 To further assess markers’ specificity for the experimental group of interest, they are used to construct classification models to discriminate between other related diseases and corresponding controls. Cross-validation AUC values of other classification models and visualization are returned.   
 ```
-$ python 9b_Specificity.py -W /workplace/ -p candidate_biomarker.txt -q test_metadata.txt -l test_relative_abundance.txt -a other_metadata.txt -x other_relative_abundance.txt -g Group -e CTR -b Cohort -c classifier -r best_param.txt -s 0 -o TEST
+$ python 12_Specificity.py -W /workplace/ -p candidate_biomarker.txt -q test_metadata.txt -l test_relative_abundance.txt -a other_metadata.txt -x other_relative_abundance.txt -g Group -e CTR -b Cohort -c classifier -r best_param.txt -s 0 -o TEST
 ```
 ```
 -q input external test metadata file for the test dataset
@@ -338,10 +336,10 @@ other_profile.txt: the relative abundance matrix of other diseases.
 - Output files:  
 specificity_result.txt: AUC values of models constructed with *candidate biomarkers* in other related diseases.  
 specificity_auc.pdf: the visualization of the specificity_result.txt.  
-##### 9c.	Model specificity assessment.   
+##### 13.	Model specificity assessment.   
 Random samples of case and control class of other diseases are added into the classification model, respectively, both labeled as “control”, the variations of corresponding AUCs of which are calculated and used for visualization.   
 ```
-$ python 9c_Specificity_add.py -W /workplace/ -m train_metadata.txt -p candidate_biomarker.txt -q test_metadata.txt -l test_profile.txt -a other_metadata.txt -x other_profile.txt -g Group -e exposure -b Cohort -c classifier -r hyperparamter.txt -n 5 -s 0 -o TEST
+$ python 13_Specificity_add.py -W /workplace/ -m train_metadata.txt -p candidate_biomarker.txt -q test_metadata.txt -l test_profile.txt -a other_metadata.txt -x other_profile.txt -g Group -e exposure -b Cohort -c classifier -r hyperparamter.txt -n 5 -s 0 -o TEST
 ```
 ```
 -q input external metadata file for the test dataset
@@ -363,7 +361,7 @@ other_profile.txt: the relative abundance matrix of other non-target diseases.
 specificity_add_result.txt: AUC values of models constructed with candidate markers in other non-target diseases.  
 specificity_add_auc.pdf: the visualization of the specificity_result.txt.  
 ### Stage 4 Biomarker interpretation.
-#### 10.	Biomarker importance.
+#### 14.	Biomarker importance.
 Permutation feature importance is employed here to evaluate biomarkers’ contributions in the best-performing classification model.  
 ```
 $ python 10_Biomarker_importance.py -W /workplace/ -m train_metadata.txt -p candidate_biomarker.txt -g Group -e exposure -c classifier -r best_param.txt -s 0 -o TEST
@@ -383,10 +381,10 @@ biomarker_importance.pdf: the visualization of feature importance file.
 Biomarker_distribution.pdf: the visualization for the abundances of the top n (set by users) important biomarkers in the discovery dataset.
 #### 11.	Microbial co-occurrence network.  
 Inter-microbiota correlation is calculated using FastSpar with 50 iterations and the output files contain the correlation and p value between each microbiota pair.   
-##### 11a. Convert.
+##### 15. Convert.
 As the input file for Step 11b needs to be microbial count profile in .tsv format where each row describes a microbial signature and each column represents a sample (could be converted profiles of all features, *differential signatures*, or *candidate biomarkers* according to users’ need, and null values needed to be set as 0) and header needs to start with “#OTU ID”, an additional file conversion script is provided.  
 ```
-$ python 11a_Convert.py -W /workplace/ -p abundance.txt -s selected_feature.txt -o TEST
+$ python 15_Convert.py -W /workplace/ -p abundance.txt -s selected_feature.txt -o TEST
 ```
 ```
 -p input feature raw count file before normalization.
@@ -397,9 +395,9 @@ abundance.txt: microbial raw count profile before normalization.
 selected_feature.txt: selected features for calculating microbial co-occurrence network (output file of Step 4 or 6)  
 - Output files:  
 convert.tsv: the converted file appropriate for constructing microbial co-occurrence network.  
-##### 11b. Microbial co-occurrence network.
+##### 16. Microbial co-occurrence network.
 ```
-$ ./11b_Microbial_network.sh -W /workplace/ –i feature_abundance.tsv -o TEST -t 4
+$ ./16_Microbial_network.sh -W /workplace/ –i feature_abundance.tsv -o TEST -t 4
 ```
 ```
 -i input feature abundance file  
@@ -411,11 +409,11 @@ convert.tsv: microbial count profile in .tsv format where each row describes a m
 - Output files:  
 median_correlation.tsv: the correlation coefficients between every input signature pair.  
 pvalues.tsv: the statistical significance of median_correlation.tsv.  
-##### 11c. Microbial co-occurrence network plot. 
+##### 17. Microbial co-occurrence network plot. 
 The visualization of Step 11 is performed using Gephi.  
 (i) Preprocess of the results of Step 11b to ensure that Step 11c only draws significant correlations (pvalues<0.05) with absolute correlation coefficients above 0.5 (default).
 ```
-$ python 11c_Microbial_network_plot.py -W /workplace/ –c median_correlation.tsv -p pvalues.tsv -t 0.5 -o TEST 
+$ python 17_Microbial_network_plot.py -W /workplace/ –c median_correlation.tsv -p pvalues.tsv -t 0.5 -o TEST 
 ```
 ```
 -c input network profile (output file of Step 11b)
@@ -438,10 +436,10 @@ microbial_network.csv: adjusted network profile for Gephi input, only significan
 (v)  For further optimization of the network, the appearances of nodes and edges should be adjusted according to users’ needs, as well as the labels of nodes.  
 <img width="415" alt="image" src="https://user-images.githubusercontent.com/54845977/171319835-a572168e-fad4-47d0-a03b-16b528c99d54.png">    
 
-#### 12.	Multi-omics correlation. 
+#### 22.	Multi-omics correlation. 
 If users have multi-omics or multidimensional microbial profiles of the same dataset, the correlation between different omics or dimensions is calculated via HAllA.
 ```
-$ ./12_Multi_omics_correlation.sh -W /workplace/ -i microbial_abundance_1.txt -d microbial_abundance_2.txt -o TEST
+$ ./22_Multi_omics_correlation.sh -W /workplace/ -i microbial_abundance_1.txt -d microbial_abundance_2.txt -o TEST
 ```
 ```
 -i input microbial abundance file 1
@@ -493,20 +491,19 @@ The time needed for the whole workflow depends on the dataset size, selected alg
 |                                                             |     4        |     0m24.858s     |     0m24.858s     |     0m24.858s     |     0m24.858s     |     0m24.858s     |     0m24.858s      |     0m24.858s      |
 |                                                             |     Total    |     2m18.186s     |     2m18.186s     |     2m18.186s     |     2m18.186s     |     2m18.186s     |     2m18.186s      |     2m18.186s      |
 |     Stage2：     Model construction                         |     5        |     0m12.464s     |     0m12.464s     |     0m12.464s     |     0m12.464s     |     0m12.464s     |     0m12.464s      |     0m12.464s      |
-|                                                             |     6a       |     0m2.733s      |     0m3.032s      |     0m50.913s     |     0m3.105s      |     0m3.252s      |     1m43.332s      |     0m49.196s      |
-|                                                             |     6b       |     0m0.846s      |     0m1.150s      |     0m1.102s      |     0m1.178s      |     0m1.015s      |     0m0.863s       |     0m1.216s       |
-|                                                             |     6c       |     0m2.447s      |     0m18.449s     |     10m32.261s    |     0m21.103s     |     0m53.413s     |     18m37.552s     |     47m59.647s     |
-|                                                             |     6*       |     24m59.785s    |     24m59.785s    |     24m59.785s    |     24m59.785s    |     24m59.785s    |     24m59.785s     |     24m59.785s     |
-|                                                             |     7        |     0m30.420s     |     0m24.735s     |     0m35.112s     |     0m42.348s     |     0m34.801s     |     8m57.417s      |     8m12.045s      |
+|                                                             |     6        |     0m2.733s      |     0m3.032s      |     0m50.913s     |     0m3.105s      |     0m3.252s      |     1m43.332s      |     0m49.196s      |
+|                                                             |     7       |     0m0.846s      |     0m1.150s      |     0m1.102s      |     0m1.178s      |     0m1.015s      |     0m0.863s       |     0m1.216s       |
+|                                                             |     8       |     0m2.447s      |     0m18.449s     |     10m32.261s    |     0m21.103s     |     0m53.413s     |     18m37.552s     |     47m59.647s     |
+|                                                             |     9        |     0m30.420s     |     0m24.735s     |     0m35.112s     |     0m42.348s     |     0m34.801s     |     8m57.417s      |     8m12.045s      |
 |                                                             |     Total    |     25m48.695s    |     25m59.615s    |     37m11.637s    |     26m19.983s    |     26m44.730s    |     54m31.413s     |     82m14.353s     |
-|     Stage3：     Model validation                           |     8        |     4m30.737s     |     4m42.105s     |     10m15.050s    |     6m10.515s     |     4m31.044s     |     91m52.940s     |     65m47.511s     |
-|                                                             |     9a       |     0m3.896s      |     0m3.776s      |     0m3.150s      |     0m3.761s      |     0m4.002       |     0m7.120s       |     0m4.266s       |
-|                                                             |     9b       |     0m4.877s      |     0m4.764s      |     0m4.426s      |     0m5.287s      |     0m5.315s      |     2m25.064s      |     0m36.946s      |
-|                                                             |     9b*      |     0m5.941s      |     0m5.982       |     0m22.211s     |     0m7.342s      |     0m6.646s      |     2m21.262s      |     0m39.554s      |
+|     Stage3：     Model validation                           |     10        |     4m30.737s     |     4m42.105s     |     10m15.050s    |     6m10.515s     |     4m31.044s     |     91m52.940s     |     65m47.511s     |
+|                                                             |     11       |     0m3.896s      |     0m3.776s      |     0m3.150s      |     0m3.761s      |     0m4.002       |     0m7.120s       |     0m4.266s       |
+|                                                             |     12       |     0m4.877s      |     0m4.764s      |     0m4.426s      |     0m5.287s      |     0m5.315s      |     2m25.064s      |     0m36.946s      |
+|                                                             |     13      |     0m5.941s      |     0m5.982       |     0m22.211s     |     0m7.342s      |     0m6.646s      |     2m21.262s      |     0m39.554s      |
 |                                                             |     Total    |     4m45.451s     |     4m56.627      |     10m44.837s    |     6m26.905s     |     4m47.007s     |     96m46.386s     |     67m8.277s      |
-|     Stage4：     Biomarker interpretation                   |     10       |     0m3.270s      |     0m3.599s      |     0m16.746s     |     0m21.809s     |     0m4.041s      |     0m46.265s      |     0m5.028s       |
-|                                                             |     11       |     6m32.696s     |     6m32.696s     |     6m32.696s     |     6m32.696s     |     6m32.696s     |     6m32.696s      |     6m32.696s      |
-|                                                             |     12       |     7m57.119s     |     7m57.119s     |     7m57.119s     |     7m57.119s     |     7m57.119s     |     7m57.119s      |     7m57.119s      |
+|     Stage4：     Biomarker interpretation                   |     14       |     0m3.270s      |     0m3.599s      |     0m16.746s     |     0m21.809s     |     0m4.041s      |     0m46.265s      |     0m5.028s       |
+|                                                             |     15-21       |     6m32.696s     |     6m32.696s     |     6m32.696s     |     6m32.696s     |     6m32.696s     |     6m32.696s      |     6m32.696s      |
+|                                                             |     22       |     7m57.119s     |     7m57.119s     |     7m57.119s     |     7m57.119s     |     7m57.119s     |     7m57.119s      |     7m57.119s      |
 |                                                             |     Total    |     14m33.085s    |     14m33.414s    |     14m46.561s    |     14m51.624s    |     14m33.856s    |     15m16.080s     |     14m34.843s     |
 |     Total                                                   |     /        |     47m25.417s    |     47m47.842s    |     65m1.221s     |     49m56.698s    |     48m23.779s    |     168m52.065s    |     166m15.659s    |
 #### 7. What skills are required to run xMarkerFinder?  
