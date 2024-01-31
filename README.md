@@ -1,4 +1,4 @@
-![image](https://github.com/tjcadd2020/xMarkerFinder/assets/54845977/e65dd533-d3eb-4bf5-9c11-4c15e9c031c9)# Identification and validation of microbial biomarkers from cross-cohort datasets using xMarkerFinder
+# Identification and validation of microbial biomarkers from cross-cohort datasets using xMarkerFinder
 xMarkerFinder is a four-stage workflow for microbiome research including differential signature identification, model construction, model validation, and biomarker interpretation. Detailed [scripts](./scripts), [example files](./data), and a ready-to-use [docker image](https://hub.docker.com/repository/docker/tjcadd2022/xmarkerfinder) are provided.
 We also provide a user-friendly [web server](https://www.biosino.org/xmarkerfinder/) for easier implementation. Feel free to explore the web server and discover more about xMarkerFinder!
 Manuscript is available at https://doi.org/10.21203/rs.3.pex-1984/v1. 
