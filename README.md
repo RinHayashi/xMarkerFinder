@@ -186,12 +186,7 @@ covariates.txt: covariates identified in Step 3 (newly generated tab-delimited f
 differential_significance_single_cohort.txt: the differential significance result in individual cohorts.  
 differential_significance.txt: meta-analytic testing results aggregating differential testing results in individual cohorts, used for next-step visualization.  
 differential_signature.txt: significantly *differential signatures* between groups derived from input filtered profiles, used as input files for feature selection.  
-differential_volcano.pdf: the volcano plot of input differential significance file.     
-### Stage 2 Model construction
-#### 5.	Classifier selection.   
-This step provides optional classifier selection for subsequent steps where the performances of every ML algorithm are generally assessed using all *differential signatures*. The output file contains the cross-validation AUC, AUPR, MCC, specificity, sensitivity, accuracy, precision, and F1 score of all classification models built with these various algorithms. Users should specify the selected classifier in all the following steps.
-differential_signature.txt: significantly differential signatures between groups derived from input filtered profiles, used as input files for feature selection.  
-differential_volcano.pdf: the volcano plot of input differential significance file.     
+differential_volcano.pdf: the volcano plot of input differential significance file.       
 ### Stage 2 Model construction
 #### 5.	Classifier selection.   
 This step provides optional classifier selection for subsequent steps where the performances of every ML algorithm are generally assessed using all differential signatures. The output file contains the cross-validation AUC, AUPR, MCC, specificity, sensitivity, accuracy, precision, and F1 score of all classification models built with these various algorithms. Users should specify the selected classifier in all the following steps.
@@ -430,7 +425,8 @@ microbial_network.csv: adjusted network profile for Gephi input, only significan
 <img width="383" alt="image" src="https://user-images.githubusercontent.com/54845977/173520895-9c15d969-13eb-4b07-9c9c-fa83b6ae00e9.png">
 
 #### 20. Choose a preferable layout type to form the basic network and press the “stop” button when the network becomes stable (Fruchterman Reingold style is recommended).    
-<img width="415" alt="image" src="https://user-images.githubusercontent.com/54845977/171319813-0fed579e-6c7d-4581-bf7e-174aa8d391e1.png">   
+<img width="415" alt="image" src="https://user-images.githubusercontent.com/54845977/171319813-0fed579e-6c7d-4581-bf7e-174aa8d391e1.png"> 
+
 #### 21. For further optimization of the network, the appearances of nodes and edges should be adjusted according to users’ needs, as well as the labels of nodes.  
 <img width="415" alt="image" src="https://user-images.githubusercontent.com/54845977/171319835-a572168e-fad4-47d0-a03b-16b528c99d54.png">    
 
@@ -456,13 +452,16 @@ It’s worth highlighting that xMarkerFinder is designed as a standard protocol 
 To provide further clarity, we present three examples showcasing the application of xMarkerFinder across various contexts. 
 #### Human microbiome
 Firstly, we used datasets from previous publications containing 16S rRNA gene sequencing data of the oral microbiome of patients with oral squamous cell carcinoma (OSCC) and controls. We applied xMarkerFinder to these oral microbiome datasets and successfully identified consistent microbial signatures associated with OCSS with great diagnostic capabilities.   
-<img width="800" alt="image" src="https://github.com/tjcadd2020/xMarkerFinder/assets/54845977/4ac5018f-7f98-429f-9ce7-6d9ce6c71d26">   
+![image](https://github.com/tjcadd2020/xMarkerFinder/assets/54845977/1d917634-e985-4c0a-86c1-4da650e312f3)
+
 #### Ocean microbiome
 Secondly, we employed metagenomic datasets from the Tara Ocean project to characterize important microbiota within the oceanic environment, capable of distinguishing between deep and surface regions.     
-<img width="800" alt="image" src="https://github.com/tjcadd2020/xMarkerFinder/assets/54845977/434ac5a6-b1d5-499d-b58f-6db2fe0ff11f">    
+![image](https://github.com/tjcadd2020/xMarkerFinder/assets/54845977/68e1f932-a18e-4eec-88a4-bcf29ec506ad)
+
 #### Human transcriptome
 To demonstrate its generalizability in different omics data, we further applied xMarkerFinder to transcriptomic datasets of non-alcoholic steatohepatitis (NASH) patients, using three publicly available NASH cohorts. The resulting classification model reached an impressive AUC value of 0.99, highlighting the robustness and applicability of xMarkerFinder.  
-<img width="800" alt="image" src="https://github.com/tjcadd2020/xMarkerFinder/assets/54845977/27b3377f-5382-47ac-b8c4-816286666d1f">  
+![image](https://github.com/tjcadd2020/xMarkerFinder/assets/54845977/63cd4531-b0c6-448c-bc73-2f793cc24626)
+
 These examples collectively serve as compelling evidence of the extensive scope of applicability inherent in xMarkerFinder.
 
 
