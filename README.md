@@ -1,4 +1,4 @@
-# Identification and validation of microbial biomarkers from cross-cohort datasets using xMarkerFinder
+![image](https://github.com/tjcadd2020/xMarkerFinder/assets/54845977/e65dd533-d3eb-4bf5-9c11-4c15e9c031c9)# Identification and validation of microbial biomarkers from cross-cohort datasets using xMarkerFinder
 xMarkerFinder is a four-stage workflow for microbiome research including differential signature identification, model construction, model validation, and biomarker interpretation. Detailed [scripts](./scripts), [example files](./data), and a ready-to-use [docker image](https://hub.docker.com/repository/docker/tjcadd2022/xmarkerfinder) are provided.
 We also provide a user-friendly [web server](https://www.biosino.org/xmarkerfinder/) for easier implementation. Feel free to explore the web server and discover more about xMarkerFinder!
 Manuscript is available at https://doi.org/10.21203/rs.3.pex-1984/v1. 
@@ -495,7 +495,7 @@ The time needed for the whole workflow depends on the dataset size, selected alg
 |                                                             |     7       |     0m0.846s      |     0m1.150s      |     0m1.102s      |     0m1.178s      |     0m1.015s      |     0m0.863s       |     0m1.216s       |
 |                                                             |     8       |     0m2.447s      |     0m18.449s     |     10m32.261s    |     0m21.103s     |     0m53.413s     |     18m37.552s     |     47m59.647s     |
 |                                                             |     9        |     0m30.420s     |     0m24.735s     |     0m35.112s     |     0m42.348s     |     0m34.801s     |     8m57.417s      |     8m12.045s      |
-|                                                             |     Total    |     25m48.695s    |     25m59.615s    |     37m11.637s    |     26m19.983s    |     26m44.730s    |     54m31.413s     |     82m14.353s     |
+|                                                             |     Total    |     0m48.91s    |     0m59.83s    |     12m11.852s    |     1m20.198s    |     1m44.945s    |     29m31.628s     |     57m14.568s     |
 |     Stage3：     Model validation                           |     10        |     4m30.737s     |     4m42.105s     |     10m15.050s    |     6m10.515s     |     4m31.044s     |     91m52.940s     |     65m47.511s     |
 |                                                             |     11       |     0m3.896s      |     0m3.776s      |     0m3.150s      |     0m3.761s      |     0m4.002       |     0m7.120s       |     0m4.266s       |
 |                                                             |     12       |     0m4.877s      |     0m4.764s      |     0m4.426s      |     0m5.287s      |     0m5.315s      |     2m25.064s      |     0m36.946s      |
@@ -505,7 +505,7 @@ The time needed for the whole workflow depends on the dataset size, selected alg
 |                                                             |     15-21       |     6m32.696s     |     6m32.696s     |     6m32.696s     |     6m32.696s     |     6m32.696s     |     6m32.696s      |     6m32.696s      |
 |                                                             |     22       |     7m57.119s     |     7m57.119s     |     7m57.119s     |     7m57.119s     |     7m57.119s     |     7m57.119s      |     7m57.119s      |
 |                                                             |     Total    |     14m33.085s    |     14m33.414s    |     14m46.561s    |     14m51.624s    |     14m33.856s    |     15m16.080s     |     14m34.843s     |
-|     Total                                                   |     /        |     47m25.417s    |     47m47.842s    |     65m1.221s     |     49m56.698s    |     48m23.779s    |     168m52.065s    |     166m15.659s    |
+|     Total                                                   |     /        |     22m25.632s    |     22m48.057s    |     40m1.436s     |     24m56.913s    |     23m23.994s    |     143m52.280s    |     141m15.874s    |
 #### 7. What skills are required to run xMarkerFinder?  
 A preliminary understanding of shell scripts would allow users to complete the whole workflow. Intermediate experience in R and Python would facilitate users to interpret and modify the codes.
 #### 8. Is xMarkerFinder a pipeline for meta-analysis?  
