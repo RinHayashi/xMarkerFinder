@@ -45,8 +45,8 @@ class machine_learning:
         
 
     def scoring(self,clf, x, y):
-        proba = clf.predict(x) 
-        pred = np.array([1 if x>0.5 else 0 for x in proba])
+        proba = clf.predict_proba(x)[:,1] 
+        pred = clf.predict(x)
         TP = ((pred==1) & (y==1)).sum()
         FP = ((pred==1) & (y==0)).sum()
         TN = ((pred==0) & (y==0)).sum()
@@ -59,7 +59,7 @@ class machine_learning:
         accuracy = accuracy_score(y, pred)
         auroc = roc_auc_score(y, proba)
         f1 = f1_score(y, pred)
-        mcc = matthews_corrcoef(y,proba)
+        mcc = matthews_corrcoef(y,pred)
         return [sen, spe, precision, accuracy, f1, auroc, aupr, mcc]
             
     def try_Classifiers(self,X, Y): 
