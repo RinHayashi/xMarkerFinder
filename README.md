@@ -375,7 +375,7 @@ biomarker_importance.txt: permutation feature importance of *candidate biomarker
 biomarker_importance.pdf: the visualization of feature importance file.
 Biomarker_distribution.pdf: the visualization for the abundances of the top n (set by users) important biomarkers in the discovery dataset.
 #### 15. Convert microbial abundance files to meet the criterion for network construction.
-As the input file for Step 11b needs to be microbial count profile in .tsv format where each row describes a microbial signature and each column represents a sample (could be converted profiles of all features, *differential signatures*, or *candidate biomarkers* according to users’ need, and null values needed to be set as 0) and header needs to start with “#OTU ID”, an additional file conversion script is provided.  
+As the input file for Step 16 needs to be microbial count profile in .tsv format where each row describes a microbial signature and each column represents a sample (could be converted profiles of all features, *differential signatures*, or *candidate biomarkers* according to users’ need, and null values needed to be set as 0) and header needs to start with “#OTU ID”, an additional file conversion script is provided.  
 ```
 $ python 15_Convert.py -W /workplace/ -p abundance.txt -s selected_feature.txt -o TEST
 ```
@@ -409,13 +409,13 @@ Preprocess of the results of Step 16 to ensure that Step 17 only draws significa
 $ python 17_Microbial_network_plot.py -W /workplace/ –c median_correlation.tsv -p pvalues.tsv -t 0.5 -o TEST 
 ```
 ```
--c input network profile (output file of Step 11b)
--p input pvalue profile (output file of Step 11b)
+-c input network profile (output file of Step 16)
+-p input pvalue profile (output file of Step 16)
 -t input correlation threshold (default: 0.5)
 ```
 - Input files:
-median_correlation.tsv: the correlation coefficients profile (output file of Step 11b).
-pvalues.tsv: the statistical significance of median_correlation.tsv (output file of Step 11b).
+median_correlation.tsv: the correlation coefficients profile (output file of Step 16).
+pvalues.tsv: the statistical significance of median_correlation.tsv (output file of Step 16).
 - Output files:
 microbial_network.csv: adjusted network profile for Gephi input, only significant correlations reserved.  
 #### 18. Open Gephi and click "File" – "Import spreadsheet", and then choose the adjusted network profile.  
