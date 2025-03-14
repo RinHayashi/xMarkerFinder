@@ -99,6 +99,7 @@ class machine_learning:
         print("Final result:", optimizer.max)
         tune_result = optimizer.max
         tune_result['params']['n_estimators'] = int(tune_result['params']['n_estimators'])
+        tune_result['params']['max_depth'] = int(tune_result['params']['max_depth']) # maxdepth to int
         return tune_result
 
     def bayesian_optimise_l1(self,X, y, clf_kfold,k_fold, n_iter = 100, init_points = 5):
@@ -197,6 +198,7 @@ class machine_learning:
         print("Final result:", optimizer.max)
         tune_result = optimizer.max
         tune_result['params']['n_estimators'] = int(tune_result['params']['n_estimators'])
+        tune_result['params']['max_depth'] = int(tune_result['params']['max_depth']) # GB的maxdepth取整
         return tune_result
 
     def bayesian_optimise_svc(self,X, y, clf_kfold,k_fold, n_iter = 100, init_points = 5):
