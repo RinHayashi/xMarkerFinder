@@ -67,9 +67,9 @@ p.threshold <- as.numeric(opts$threshold)
 options(warn=-1)
 
 metadata <- metadata %>% 
-    mutate(Group = case_when(
-        Group == case ~ paste0("z",case),
-        TRUE ~ paste0("a",Group)
+    mutate(!!exposure := case_when(
+        .data[[exposure]] == case ~ paste0("z", case),
+        TRUE ~ paste0("a", .data[[exposure]])
     ))
 
 metadata <- metadata[colnames(feat_abd),]
@@ -83,6 +83,14 @@ scale_0_to_1 <- function(data) {
 }
 
 feat_abd_scale <- scale_0_to_1(feat_abd)
+
+# deal with na values
+rows_with_na <- apply(feat_abd_scale, 1, function(row) any(is.na(row)))
+if (any(rows_with_na)) {
+  cat("Following rows with NA values have been deleted：\n")
+  cat(rownames(feat_abd_scale)[rows_with_na], "\n")
+}
+feat_abd_scale <- feat_abd_scale[!rows_with_na, ]
 
 #Differential analysis
 file_path <- paste(opts$workplace,opts$covariates,sep='')
